@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>RentB2B — рабочий HTML MVP</title>
+<style>
+:root{
+  --bg:#eef2f4;--surface:#fff;--surface2:#f6f8f9;--ink:#101820;--muted:#6f7b84;
+  --line:#dfe5e9;--dark:#111a21;--accent:#c8ff35;--accent-2:#b6f21b;--blue:#edf4f7;
+  --green:#dff8d7;--green-ink:#24733a;--yellow:#fff1c7;--yellow-ink:#856000;--red:#ffe0df;--red-ink:#a23832;
+  --shadow:0 16px 42px rgba(16,24,32,.10);--r:18px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",Arial,sans-serif}
+button,input,select,textarea{font:inherit}
+button{border:0;cursor:pointer}
+a{color:inherit;text-decoration:none}
+.hidden{display:none!important}
+.muted{color:var(--muted)} .tiny{font-size:11px}.small{font-size:12px}.bold{font-weight:800}
+.demo-bar{position:sticky;top:0;z-index:100;padding:10px 14px;background:var(--dark);color:#fff;display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
+.demo-bar .label{font-size:12px;color:#aab4ba;margin-right:4px}
+.demo-btn{padding:8px 12px;border-radius:10px;background:#27333c;color:#fff;font-size:12px}
+.demo-btn.active{background:var(--accent);color:var(--ink)}
+.toast{position:fixed;right:18px;top:68px;z-index:500;max-width:330px;background:var(--dark);color:#fff;padding:12px 14px;border-radius:12px;box-shadow:var(--shadow);opacity:0;transform:translateY(-10px);pointer-events:none;transition:.25s}
+.toast.show{opacity:1;transform:none}
+.shell{width:390px;min-height:830px;margin:24px auto 44px;background:#f8fafb;border:8px solid #dbe2e6;border-radius:34px;box-shadow:0 24px 80px rgba(0,0,0,.16);overflow:hidden;position:relative}
+.status{height:30px;background:#fff;padding:7px 16px;font-size:12px;display:flex;justify-content:space-between}
+.mobile-screen{display:none;min-height:792px;padding:16px 16px 92px}
+.mobile-screen.active{display:block}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
+.icon{width:38px;height:38px;border:1px solid var(--line);border-radius:50%;background:#fff;display:grid;place-items:center}
+.logo{font-weight:900;letter-spacing:-.8px}
+h1,h2,h3{margin:0;letter-spacing:-1px}
+h1{font-size:34px;line-height:1.02}h2{font-size:25px}h3{font-size:17px}
+p{margin:0;line-height:1.4;color:var(--muted)}
+.search{height:50px;background:#fff;border:1px solid var(--line);border-radius:15px;padding:0 13px;display:flex;gap:9px;align-items:center;margin:16px 0 10px}
+.search input{width:100%;border:0;outline:0;background:transparent}
+.chips{display:flex;gap:8px;overflow:auto;padding-bottom:3px}.chips::-webkit-scrollbar{display:none}
+.chip{padding:8px 11px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:12px;white-space:nowrap}
+.chip.active{background:var(--dark);color:#fff;border-color:var(--dark)}
+.hero{height:245px;border-radius:23px;margin:12px 0 18px;padding:18px;overflow:hidden;position:relative;background:linear-gradient(150deg,#d9eaf1,#9ab6c3)}
+.hero .machine{position:absolute;right:-12px;bottom:12px;font-size:108px;filter:drop-shadow(0 12px 12px rgba(0,0,0,.17))}
+.hero h2{max-width:210px;font-size:30px;line-height:1.0;margin-top:4px}.hero p{max-width:200px;color:#384952;font-size:12px;margin-top:9px}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin:16px 0 10px}.section-title span{font-size:12px;color:var(--muted)}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.cat{background:#fff;border:1px solid var(--line);border-radius:15px;padding:12px 4px;font-size:10px;text-align:center}.cat .ico{display:block;font-size:24px;margin-bottom:6px}
+.banner{background:var(--dark);color:#fff;border-radius:20px;padding:15px;margin:17px 0}.banner p{color:#adb7bd;font-size:12px;margin-top:5px}
+.btn{background:var(--accent);color:var(--ink);padding:13px 16px;border-radius:14px;font-weight:800}.btn.dark{background:var(--dark);color:#fff}.btn.ghost{background:#fff;border:1px solid var(--line)}.btn.danger{background:var(--red);color:var(--red-ink)}.full{width:100%}
+.card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:11px;display:flex;gap:10px;align-items:center;transition:.2s}.card:hover{transform:translateY(-1px);box-shadow:0 9px 24px rgba(16,24,32,.06)}
+.list{display:grid;gap:9px}
+.thumb{width:78px;height:66px;border-radius:13px;background:linear-gradient(145deg,#dde9ee,#a0b5bf);display:grid;place-items:center;font-size:36px;flex:none}
+.meta{flex:1;min-width:0}.meta h3{font-size:14px}.price{font-weight:900;margin-top:4px}.rating{font-size:11px;color:#967000}
+.bottom-nav{position:absolute;left:0;right:0;bottom:0;height:76px;background:rgba(255,255,255,.97);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:8px 5px 10px;z-index:20}
+.bottom-nav button{background:transparent;color:#7e8891;font-size:10px;display:flex;flex-direction:column;align-items:center;gap:5px}.bottom-nav button.active{color:var(--ink);font-weight:800}.bottom-nav i{font-style:normal;font-size:19px}
+.product-img{height:248px;border-radius:22px;background:linear-gradient(150deg,#cfdee5,#879da7);display:grid;place-items:center;font-size:116px;margin-bottom:14px}.price-big{font-size:31px;font-weight:900;letter-spacing:-1.6px}
+.info{background:#fff;border:1px solid var(--line);border-radius:17px;margin-top:12px;padding:13px}.info-row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px}.info-row:last-child{border-bottom:0}
+.form{display:grid;gap:9px}.field{background:#fff;border:1px solid var(--line);border-radius:13px;padding:11px}.field label{display:block;font-size:10px;color:var(--muted);margin-bottom:5px}.field input,.field select,.field textarea{width:100%;border:0;outline:0;background:transparent}
+.status-pill{display:inline-block;padding:5px 8px;border-radius:999px;background:var(--green);color:var(--green-ink);font-size:10px;font-weight:800}.status-pill.wait{background:var(--yellow);color:var(--yellow-ink)}.status-pill.off{background:var(--red);color:var(--red-ink)}
+.message-list{height:455px;overflow:auto;padding:4px 0;display:grid;align-content:start;gap:10px}.msg{max-width:82%;padding:10px 11px;border-radius:14px;background:#fff;border:1px solid var(--line);font-size:13px}.msg.me{margin-left:auto;background:var(--dark);color:#fff;border-color:var(--dark)}
+.chatbar{display:flex;gap:7px;margin-top:10px}.chatbar input{flex:1;border:1px solid var(--line);border-radius:13px;padding:11px 12px;outline:0;background:#fff}
+.success{min-height:520px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}.check{width:88px;height:88px;border-radius:50%;background:var(--accent);display:grid;place-items:center;font-size:46px;margin-bottom:18px}
+.empty{padding:38px 12px;text-align:center;color:var(--muted)}
+/* desktop dashboards */
+.dashboard-wrap{max-width:1180px;margin:24px auto 60px;padding:0 20px}
+.dash{display:grid;grid-template-columns:220px 1fr;gap:16px}
+.sidebar{background:#fff;border:1px solid var(--line);border-radius:22px;padding:12px;height:max-content;position:sticky;top:70px}
+.side-group{font-size:10px;text-transform:uppercase;color:#9aa4ab;padding:10px 10px 7px}.side-btn{width:100%;background:transparent;text-align:left;padding:11px 10px;border-radius:11px;color:#56636c}.side-btn:hover{background:#f1f5f6}.side-btn.active{background:#eef3f5;color:var(--ink);font-weight:800}
+.dash-main{min-width:0}.dash-head{display:flex;justify-content:space-between;align-items:flex-end;gap:15px;margin-bottom:16px}.dash-head p{margin-top:4px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:var(--shadow)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}.kpi{background:#f5f8f9;border-radius:17px;padding:14px}.kpi .k{font-size:11px;color:var(--muted)}.kpi b{display:block;font-size:23px;margin-top:8px}.trend{font-size:10px;color:#23733a}
+.two{display:grid;grid-template-columns:1.3fr 1fr;gap:12px;margin-top:12px}
+.fake-chart{height:245px;border:1px solid var(--line);border-radius:16px;background:
+linear-gradient(180deg,rgba(200,255,53,.16),transparent),
+repeating-linear-gradient(to bottom,#fff 0,#fff 48px,#eef2f4 49px);position:relative;overflow:hidden}
+.fake-chart svg{width:100%;height:100%}
+.table{width:100%;border-collapse:collapse}.table th,.table td{text-align:left;padding:11px 8px;border-bottom:1px solid var(--line);font-size:12px}.table th{font-size:10px;text-transform:uppercase;color:#89949c}
+.toolbar{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;margin-bottom:12px}.toolbar .left,.toolbar .right{display:flex;gap:8px;flex-wrap:wrap}.input{height:40px;padding:0 12px;border:1px solid var(--line);border-radius:11px;background:#fff;outline:0}
+.toolbar select{height:40px;border:1px solid var(--line);border-radius:11px;padding:0 10px;background:#fff}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.mini{padding:7px 9px;border-radius:9px;background:#f1f4f6;color:#39454d;font-size:11px}.mini.danger{background:var(--red);color:var(--red-ink)}
+.tabs{display:flex;gap:8px;overflow:auto;margin-bottom:14px}.tab{padding:9px 12px;background:#f2f5f6;border-radius:10px;font-size:11px}.tab.active{background:var(--dark);color:#fff}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.detail-box{background:#f6f8f9;border-radius:16px;padding:14px}.detail-box h4{margin:0 0 8px}
+.overlay{position:fixed;inset:0;z-index:300;background:rgba(16,24,32,.42);display:none;align-items:center;justify-content:center;padding:20px}.overlay.show{display:flex}
+.modal{width:min(560px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:22px;padding:18px;box-shadow:0 24px 90px rgba(0,0,0,.22)}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.close{width:34px;height:34px;border-radius:50%;background:#f2f5f6}
+@media(max-width:900px){
+  .dashboard-wrap{display:none}
+  .dashboard-wrap:not(.hidden){display:block}
+  .shell{margin:18px auto 34px}
+  .demo-bar{position:relative}
+  .dash{grid-template-columns:1fr}
+  .sidebar{position:relative;top:auto;display:flex;gap:5px;overflow:auto;padding:8px}
+  .sidebar>div:first-child,.sidebar .side-group{display:none}
+  .side-btn{white-space:nowrap;width:auto;padding:9px 11px}
+  .dash-main{min-width:0}
+  .dashboard-wrap{padding:0 10px;margin:14px auto 30px}
+  .dash-head{align-items:flex-start;flex-direction:column}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .two,.detail-grid{grid-template-columns:1fr}
+  .panel{padding:14px}
+  .table{min-width:720px}
+  .panel:has(.table){overflow-x:auto}
+}
+@media(min-width:901px){#mobileApp{display:block;margin-left:24px}.shell{position:fixed;left:18px;bottom:18px;margin:0;z-index:50;transform:scale(.82);transform-origin:bottom left}.desktop-hint{margin-left:365px}.client-only .shell{display:block}}
+</style>
+</head>
+<body>
+
+<div class="demo-bar">
+  <span class="label">RentB2B · тестовый режим</span>
+  <button class="demo-btn active" onclick="switchMode('client',this)">Клиент</button>
+  <button class="demo-btn" onclick="switchMode('company',this)">Компания</button>
+  <button class="demo-btn" onclick="switchMode('admin',this)">Админ</button>
+  <span class="label">данные тестовые</span>
+</div>
+<div id="toast" class="toast"></div>
+
+<!-- CLIENT MOBILE -->
+<div id="mobileApp" class="shell">
+  <div class="status"><span>9:41</span><span>● ● ▮</span></div>
+
+  <section id="c-home" class="mobile-screen active">
+    <div class="top"><div class="logo">RentB2B</div><div style="display:flex;gap:7px"><button class="icon">♡</button><div class="avatar">ИП</div></div></div>
+    <h1>Найдите всё<br>для бизнеса<br>в аренду</h1>
+    <div class="search"><span>⌕</span><input id="homeSearch" placeholder="Что хотите арендовать?" onkeydown="if(event.key==='Enter')clientSearch(this.value)"><b>→</b></div>
+    <div class="chips">
+      <button class="chip" onclick="clientSearch('Экскаватор')">Экскаватор</button><button class="chip" onclick="clientSearch('Авто')">Авто</button><button class="chip" onclick="clientSearch('Генератор')">Генератор</button><button class="chip" onclick="clientSearch('Офис')">Офис</button>
+    </div>
+    <div class="section-title"><h3>Категории</h3><span onclick="goClient('c-catalog')">Все →</span></div>
+    <div class="grid4">
+      <button class="cat" onclick="clientSearch('Авто')"><span class="ico">🚙</span>Авто</button>
+      <button class="cat" onclick="clientSearch('Техника')"><span class="ico">🚜</span>Техника</button>
+      <button class="cat" onclick="clientSearch('Инструменты')"><span class="ico">🛠️</span>Инструменты</button>
+      <button class="cat" onclick="clientSearch('Недвижимость')"><span class="ico">🏢</span>Недвижимость</button>
+      <button class="cat" onclick="clientSearch('Водный транспорт')"><span class="ico">🚤</span>Водный транспорт</button>
+      <button class="cat" onclick="clientSearch('Оборудование')"><span class="ico">⚙️</span>Оборудование</button>
+      <button class="cat" onclick="clientSearch('IT')"><span class="ico">💻</span>IT и офис</button>
+      <button class="cat" onclick="goClient('c-catalog')"><span class="ico">＋</span>Ещё</button>
+    </div>
+    <div class="banner"><b>Коммерческий транспорт</b><p>Для больших и малых задач бизнеса</p><button class="btn" style="margin-top:11px" onclick="clientSearch('Авто')">Смотреть →</button></div>
+    <div class="section-title"><h3>Популярное</h3><span onclick="goClient('c-catalog')">Все →</span></div>
+    <div id="popularList" class="list"></div>
+  </section>
+
+  <section id="c-catalog" class="mobile-screen">
+    <div class="top"><h2>Каталог</h2><button class="icon">⚙</button></div>
+    <div class="search"><span>⌕</span><input id="catalogSearch" placeholder="Поиск по объявлениям" oninput="renderCatalog(this.value)"></div>
+    <div class="chips"><button class="chip active">Все</button><button class="chip" onclick="clientSearch('Авто')">Авто</button><button class="chip" onclick="clientSearch('Техника')">Техника</button><button class="chip" onclick="clientSearch('Недвижимость')">Недвижимость</button></div>
+    <div class="section-title"><h3>Предложения</h3><span id="catalogCount"></span></div>
+    <div id="catalogList" class="list"></div>
+  </section>
+
+  <section id="c-favorites" class="mobile-screen">
+    <div class="top"><h2>Избранное</h2><button class="icon">♡</button></div>
+    <p class="small">Сохранённые предложения</p>
+    <div id="favoriteList" class="list" style="margin-top:14px"></div>
+  </section>
+
+  <section id="c-bookings" class="mobile-screen">
+    <div class="top"><h2>Мои заявки</h2><button class="icon">⋯</button></div>
+    <div class="chips"><button class="chip active">Текущие</button><button class="chip">История</button></div>
+    <div id="bookingList" class="list" style="margin-top:14px"></div>
+  </section>
+
+  <section id="c-profile" class="mobile-screen">
+    <div class="top"><h2>Профиль</h2><button class="icon" onclick="openModal('settingsModal')">⚙</button></div>
+    <div class="card" style="margin-bottom:13px"><div class="avatar" style="width:54px;height:54px">ИП</div><div><b>Иван Петров</b><div class="small">ivan@company.ru</div><div class="small">ООО «СтройТех»</div></div></div>
+    <div class="list">
+      <button class="card" onclick="goClient('c-bookings')"><b>Мои заявки</b><span>3 ›</span></button>
+      <button class="card" onclick="openModal('docsModal')"><b>Документы</b><span>12 ›</span></button>
+      <button class="card" onclick="goClient('c-favorites')"><b>Избранное</b><span id="favCount">0 ›</span></button>
+      <button class="card" onclick="openModal('supportModal')"><b>Поддержка</b><span>›</span></button>
+      <button class="card" onclick="showToast('Профиль компании доступен из кабинета компании')"><b>Профиль компании</b><span>›</span></button>
+    </div>
+  </section>
+
+  <section id="c-product" class="mobile-screen">
+    <div class="top"><button class="icon" onclick="goClient('c-catalog')">‹</button><div style="display:flex;gap:7px"><button class="icon" onclick="toggleFavoriteCurrent()">♡</button><button class="icon">↗</button></div></div>
+    <div class="product-img" id="productEmoji">🚜</div>
+    <div class="small" id="productCategory">Техника · Москва</div>
+    <h2 id="productTitle">Экскаватор JCB 3CX</h2>
+    <div class="rating">★ <span id="productRating">4.9</span> · 128 отзывов</div>
+    <div style="margin:12px 0"><span class="price-big" id="productPrice">12 000 ₽</span> <span class="small">/ день</span></div>
+    <div class="card"><div class="avatar">СТ</div><div><b id="productCompany">СтройТех</b><div class="small">Проверенная компания · B2B</div></div><span>›</span></div>
+    <div class="info">
+      <div class="info-row"><span>Доступность</span><b>12–18 октября</b></div>
+      <div class="info-row"><span>Минимальный срок</span><b>1 день</b></div>
+      <div class="info-row"><span>Получение</span><b>Самовывоз / доставка</b></div>
+    </div>
+    <div class="section-title"><h3>Описание</h3></div><p>Надёжная техника для строительных и земляных работ. Возможна работа оператора и доставка.</p>
+    <div class="bottom-cta" style="margin-top:14px"><button class="btn full" onclick="goClient('c-booking')">Арендовать →</button><button class="btn ghost full" style="margin-top:8px" onclick="goClient('c-chat')">Задать вопрос</button></div>
+  </section>
+
+  <section id="c-booking" class="mobile-screen">
+    <div class="top"><button class="icon" onclick="goClient('c-product')">‹</button><h2>Оформление</h2><span></span></div>
+    <div class="card"><div class="thumb" id="bookingThumb">🚜</div><div class="meta"><b id="bookingProductTitle">Экскаватор JCB 3CX</b><div class="price" id="bookingProductPrice">12 000 ₽/день</div></div></div>
+    <div class="section-title"><h3>Период аренды</h3></div>
+    <div class="form">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div class="field"><label>Начало</label><input id="dateFrom" type="date" value="2026-10-12"></div><div class="field"><label>Конец</label><input id="dateTo" type="date" value="2026-10-18"></div></div>
+      <div class="field"><label>Количество</label><input id="quantity" type="number" min="1" value="1"></div>
+      <div class="field"><label>Способ получения</label><select id="delivery"><option>Самовывоз</option><option>Доставка</option><option>Другое</option></select></div>
+      <div class="field"><label>Имя</label><input id="name" value="Иван Петров"></div>
+      <div class="field"><label>Телефон</label><input id="phone" value="+7 912 345-67-89"></div>
+      <div class="field"><label>Комментарий</label><textarea id="comment" rows="3">Нужен с оператором. Работа на объекте в Москве.</textarea></div>
+      <div class="info"><div class="info-row"><span>Предварительная стоимость</span><b id="bookingTotal">84 000 ₽</b></div><div class="tiny muted">Точная сумма подтверждается компанией.</div></div>
+      <button class="btn full" onclick="submitBooking()">Сформировать заявку →</button>
+    </div>
+  </section>
+
+  <section id="c-success" class="mobile-screen">
+    <div class="success"><div class="check">✓</div><h2>Заявка создана</h2><p style="margin-top:7px">№ <b id="successId">RB-10284</b></p><p style="margin-top:7px">Компания получила заявку и свяжется с вами для подтверждения деталей.</p><button class="btn" style="margin-top:20px" onclick="goClient('c-bookings')">Перейти к заявкам</button><button class="btn ghost" style="margin-top:8px" onclick="goClient('c-home')">На главную</button></div>
+  </section>
+
+  <section id="c-chat" class="mobile-screen">
+    <div class="top"><button class="icon" onclick="goClient('c-product')">‹</button><div><b id="chatCompany">СтройТех</b><div class="tiny muted">Онлайн · отвечает обычно за 5 мин</div></div><button class="icon">⋯</button></div>
+    <div id="messageList" class="message-list"></div>
+    <div class="chatbar"><input id="chatInput" placeholder="Напишите сообщение..." onkeydown="if(event.key==='Enter')sendChat()"><button class="btn" onclick="sendChat()">→</button></div>
+  </section>
+
+  <nav class="bottom-nav">
+    <button data-target="c-home" class="active" onclick="goClient('c-home')"><i>⌂</i>Главная</button>
+    <button data-target="c-catalog" onclick="goClient('c-catalog')"><i>▦</i>Каталог</button>
+    <button data-target="c-favorites" onclick="goClient('c-favorites')"><i>♡</i>Избранное</button>
+    <button data-target="c-bookings" onclick="goClient('c-bookings')"><i>▣</i>Заявки</button>
+    <button data-target="c-profile" onclick="goClient('c-profile')"><i>●</i>Профиль</button>
+  </nav>
+</div>
+
+<!-- COMPANY DESKTOP -->
+<div id="companyView" class="dashboard-wrap hidden desktop-hint">
+  <div class="dash">
+    <aside class="sidebar">
+      <div style="padding:8px 10px 14px;font-weight:900;font-size:18px">RentB2B</div>
+      <div class="side-group">Компания</div>
+      <button class="side-btn active" data-page="co-overview" onclick="companyPage('co-overview',this)">Обзор</button>
+      <button class="side-btn" data-page="co-products" onclick="companyPage('co-products',this)">Мои товары</button>
+      <button class="side-btn" data-page="co-requests" onclick="companyPage('co-requests',this)">Новые заявки <b>5</b></button>
+      <button class="side-btn" data-page="co-rentals" onclick="companyPage('co-rentals',this)">Активные аренды</button>
+      <button class="side-btn" data-page="co-history" onclick="companyPage('co-history',this)">История</button>
+      <button class="side-btn" data-page="co-stats" onclick="companyPage('co-stats',this)">Статистика</button>
+      <button class="side-btn" data-page="co-profile" onclick="companyPage('co-profile',this)">Профиль компании</button>
+    </aside>
+    <main class="dash-main"><div style="margin-bottom:12px"><button class="mini" onclick="switchMode('client',document.querySelector('.demo-btn'))">← Клиентское приложение</button></div>
+      <div id="companyContent"></div>
+    </main>
+  </div>
+</div>
+
+<!-- ADMIN DESKTOP -->
+<div id="adminView" class="dashboard-wrap hidden desktop-hint">
+  <div class="dash">
+    <aside class="sidebar">
+      <div style="padding:8px 10px 14px;font-weight:900;font-size:18px">RentB2B Admin</div>
+      <div class="side-group">Платформа</div>
+      <button class="side-btn active" data-page="ad-overview" onclick="adminPage('ad-overview',this)">Обзор</button>
+      <button class="side-btn" data-page="ad-users" onclick="adminPage('ad-users',this)">Пользователи</button>
+      <button class="side-btn" data-page="ad-companies" onclick="adminPage('ad-companies',this)">Компании</button>
+      <button class="side-btn" data-page="ad-listings" onclick="adminPage('ad-listings',this)">Объявления</button>
+      <button class="side-btn" data-page="ad-requests" onclick="adminPage('ad-requests',this)">Заявки</button>
+      <button class="side-btn" data-page="ad-rentals" onclick="adminPage('ad-rentals',this)">Аренды</button>
+      <button class="side-btn" data-page="ad-categories" onclick="adminPage('ad-categories',this)">Категории</button>
+      <button class="side-btn" data-page="ad-stats" onclick="adminPage('ad-stats',this)">Статистика</button>
+      <div class="side-group">Система</div>
+      <button class="side-btn" onclick="showToast('Настройки платформы — демо-раздел')">Настройки</button>
+      <button class="side-btn" onclick="showToast('Модерация: 7 объектов требуют внимания')">Модерация <b style="color:#b24">7</b></button>
+    </aside>
+    <main class="dash-main"><div style="margin-bottom:12px"><button class="mini" onclick="switchMode('client',document.querySelector('.demo-btn'))">← Клиентское приложение</button></div>
+      <div id="adminContent"></div>
+    </main>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div id="overlay" class="overlay" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+const products=[
+ {id:1,title:'Экскаватор JCB 3CX',cat:'Техника',city:'Москва',price:12000,priceText:'12 000 ₽/день',emoji:'🚜',rating:4.9,company:'СтройТех',views:1200,requests:34,status:'active'},
+ {id:2,title:'Toyota Land Cruiser 300',cat:'Авто',city:'Москва',price:18000,priceText:'18 000 ₽/день',emoji:'🚙',rating:4.8,company:'DrivePro',views:980,requests:21,status:'active'},
+ {id:3,title:'Генератор 100 кВт',cat:'Оборудование',city:'Москва',price:5000,priceText:'5 000 ₽/день',emoji:'⚡',rating:4.7,company:'PowerRent',views:640,requests:18,status:'active'},
+ {id:4,title:'Офис 120 м²',cat:'Недвижимость',city:'Москва',price:150000,priceText:'150 000 ₽/месяц',emoji:'🏢',rating:4.6,company:'CitySpace',views:410,requests:8,status:'active'},
+ {id:5,title:'Мини-погрузчик Bobcat',cat:'Техника',city:'Москва',price:8000,priceText:'8 000 ₽/день',emoji:'🚜',rating:4.8,company:'СтройТех',views:710,requests:16,status:'active'},
+ {id:6,title:'Комплект электроинструмента',cat:'Инструменты',city:'Химки',price:3200,priceText:'3 200 ₽/день',emoji:'🛠️',rating:4.7,company:'ToolBox',views:530,requests:12,status:'active'},
+ {id:7,title:'Гидроцикл Sea-Doo',cat:'Водный транспорт',city:'Сочи',price:14000,priceText:'14 000 ₽/день',emoji:'🚤',rating:4.9,company:'WaveRent',views:880,requests:29,status:'active'},
+ {id:8,title:'Офисный блок 240 м²',cat:'Недвижимость',city:'Москва',price:280000,priceText:'280 000 ₽/месяц',emoji:'🏬',rating:4.5,company:'BusinessEstate',views:290,requests:5,status:'active'}
+];
+let favorites=new Set([2]);
+let currentProductId=1;
+let bookings=[{id:'RB-10284',productId:1,date:'12.10 — 18.10.2026',status:'Ожидает подтверждения'},{id:'RB-10240',productId:2,date:'12.10 — 20.10.2026',status:'В аренде'}];
+let messages=[{me:false,text:'Здравствуйте! Экскаватор доступен на выбранные даты.'},{me:true,text:'Отлично. Нужен оператор и доставка на объект в Москве.'},{me:false,text:'Да, можем предоставить оператора. Стоимость доставки обсудим в заявке.'}];
+
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.classList.remove('show'),2200)}
+function switchMode(mode,btn){
+ document.querySelectorAll('.demo-btn').forEach(x=>x.classList.remove('active'));
+ if(btn) btn.classList.add('active');
+
+ const mobile=document.getElementById('mobileApp');
+ const company=document.getElementById('companyView');
+ const admin=document.getElementById('adminView');
+
+ mobile.classList.toggle('hidden',mode!=='client');
+ company.classList.toggle('hidden',mode!=='company');
+ admin.classList.toggle('hidden',mode!=='admin');
+
+ // Принудительно обновляем страницу после переключения режима,
+ // чтобы не оставалось старого состояния интерфейса.
+ if(mode==='company'){
+   company.classList.remove('hidden');
+   admin.classList.add('hidden');
+   mobile.classList.add('hidden');
+   companyPage('co-overview',document.querySelector('#companyView .side-btn[data-page="co-overview"]'));
+   window.scrollTo({top:0,behavior:'smooth'});
+ }
+ if(mode==='admin'){
+   admin.classList.remove('hidden');
+   company.classList.add('hidden');
+   mobile.classList.add('hidden');
+   adminPage('ad-overview',document.querySelector('#adminView .side-btn[data-page="ad-overview"]'));
+   window.scrollTo({top:0,behavior:'smooth'});
+ }
+ if(mode==='client'){
+   mobile.classList.remove('hidden');
+   company.classList.add('hidden');
+   admin.classList.add('hidden');
+   goClient('c-home');
+   window.scrollTo({top:0,behavior:'smooth'});
+ }
+}
+function goClient(id){
+ document.querySelectorAll('.mobile-screen').forEach(s=>s.classList.remove('active'));
+ const el=document.getElementById(id);if(el)el.classList.add('active');
+ const base=['c-home','c-catalog','c-favorites','c-bookings','c-profile'];
+ document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.toggle('active',b.dataset.target===id));
+ if(id==='c-catalog')renderCatalog(document.getElementById('catalogSearch').value);
+ if(id==='c-favorites')renderFavorites();
+ if(id==='c-bookings')renderBookings();
+ if(id==='c-home')renderPopular();
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+function clientSearch(v){document.getElementById('homeSearch').value=v;document.getElementById('catalogSearch').value=v;goClient('c-catalog');renderCatalog(v)}
+function renderPopular(){document.getElementById('popularList').innerHTML=products.slice(0,4).map(productCard).join('')}
+function productCard(p){
+ const fav=favorites.has(p.id);
+ return `<div class="card" onclick="openProduct(${p.id})">
+  <div class="thumb">${p.emoji}</div><div class="meta"><h3>${p.title}</h3><div class="small">${p.cat} · ${p.city} · ${p.company}</div><div class="price">${p.priceText}</div><div class="rating">★ ${p.rating}</div></div>
+  <button class="icon" onclick="event.stopPropagation();toggleFavorite(${p.id})">${fav?'♥':'♡'}</button>
+ </div>`
+}
+function renderCatalog(filter=''){
+ const q=(filter||'').trim().toLowerCase();
+ const arr=products.filter(p=>(p.title+' '+p.cat+' '+p.city+' '+p.company).toLowerCase().includes(q));
+ document.getElementById('catalogCount').textContent=arr.length+' предложений';
+ document.getElementById('catalogList').innerHTML=arr.length?arr.map(productCard).join(''):`<div class="empty">По запросу ничего не найдено.<br>Попробуйте изменить запрос.</div>`;
+}
+function toggleFavorite(id){
+ favorites.has(id)?favorites.delete(id):favorites.add(id);
+ renderPopular();renderCatalog(document.getElementById('catalogSearch').value);renderFavorites();updateFavCount();
+ showToast(favorites.has(id)?'Добавлено в избранное':'Удалено из избранного');
+}
+function updateFavCount(){document.getElementById('favCount').textContent=favorites.size+' ›'}
+function renderFavorites(){const arr=products.filter(p=>favorites.has(p.id));document.getElementById('favoriteList').innerHTML=arr.length?arr.map(productCard).join(''):`<div class="empty">Избранное пока пустое.<br>Нажимайте ♡ на интересных предложениях.</div>`}
+function openProduct(id){
+ const p=products.find(x=>x.id===id)||products[0];currentProductId=p.id;
+ document.getElementById('productEmoji').textContent=p.emoji;document.getElementById('productCategory').textContent=p.cat+' · '+p.city;
+ document.getElementById('productTitle').textContent=p.title;document.getElementById('productRating').textContent=p.rating;
+ document.getElementById('productPrice').textContent=p.priceText.split('/')[0];document.getElementById('productCompany').textContent=p.company;
+ document.getElementById('bookingThumb').textContent=p.emoji;document.getElementById('bookingProductTitle').textContent=p.title;document.getElementById('bookingProductPrice').textContent=p.priceText;
+ updateBookingTotal();goClient('c-product');
+}
+function toggleFavoriteCurrent(){toggleFavorite(currentProductId)}
+function updateBookingTotal(){
+ const p=products.find(x=>x.id===currentProductId)||products[0];
+ const qty=Number(document.getElementById('quantity')?.value||1);
+ const d1=new Date(document.getElementById('dateFrom')?.value||'2026-10-12');
+ const d2=new Date(document.getElementById('dateTo')?.value||'2026-10-18');
+ let days=Math.max(1,Math.ceil((d2-d1)/86400000));
+ document.getElementById('bookingTotal').textContent=(p.price*days*qty).toLocaleString('ru-RU')+' ₽';
+}
+['quantity','dateFrom','dateTo'].forEach(id=>document.getElementById(id)?.addEventListener('input',updateBookingTotal));
+function submitBooking(){
+ const p=products.find(x=>x.id===currentProductId)||products[0];
+ const id='RB-'+Math.floor(10000+Math.random()*89999);
+ bookings.unshift({id,productId:p.id,date:(document.getElementById('dateFrom').value||'2026-10-12').split('-').reverse().join('.')+' — '+(document.getElementById('dateTo').value||'2026-10-18').split('-').reverse().join('.'),status:'Ожидает подтверждения'});
+ document.getElementById('successId').textContent=id;renderBookings();goClient('c-success');showToast('Заявка отправлена');
+}
+function renderBookings(){
+ document.getElementById('bookingList').innerHTML=bookings.map(b=>{
+  const p=products.find(x=>x.id===b.productId)||products[0];const cls=b.status==='В аренде'?'':'wait';
+  return `<div class="card"><div class="thumb">${p.emoji}</div><div class="meta"><b>${p.title}</b><div class="small">${b.date}</div><div class="tiny muted">${b.id}</div><span class="status-pill ${cls}">${b.status}</span></div><button class="icon" onclick="openBooking('${b.id}')">›</button></div>`;
+ }).join('');
+}
+function openBooking(id){const b=bookings.find(x=>x.id===id);const p=products.find(x=>x.id===b.productId);openModalHtml(`<div class="modal-head"><div><h2>Заявка ${b.id}</h2><p>${p.title}</p></div><button class="close" onclick="closeOverlay()">×</button></div><div class="info">${[['Статус',b.status],['Период',b.date],['Компания',p.company],['Стоимость',p.priceText]].map(x=>`<div class="info-row"><span>${x[0]}</span><b>${x[1]}</b></div>`).join('')}</div><div class="actions" style="margin-top:12px"><button class="btn ghost" onclick="closeOverlay()">Закрыть</button><button class="btn danger" onclick="cancelBooking('${id}')">Отменить заявку</button></div>`)}
+function cancelBooking(id){const i=bookings.findIndex(b=>b.id===id);if(i>=0){bookings[i].status='Отменена';renderBookings();closeOverlay();showToast('Заявка отменена')}}
+function sendChat(){const v=document.getElementById('chatInput').value.trim();if(!v)return;messages.push({me:true,text:v});document.getElementById('chatInput').value='';renderChat();setTimeout(()=>{messages.push({me:false,text:'Принял. Уточню детали и вернусь с ответом.'});renderChat()},600)}
+function renderChat(){document.getElementById('messageList').innerHTML=messages.map(m=>`<div class="msg ${m.me?'me':''}">${m.text}</div>`).join('');const x=document.getElementById('messageList');x.scrollTop=x.scrollHeight}
+function openModal(name){
+ const map={
+  docsModal:`<div class="modal-head"><h2>Документы</h2><button class="close" onclick="closeOverlay()">×</button></div><div class="list">${['Договор аренды RB-10284.pdf','Акт приёма-передачи.pdf','Счёт №1448.pdf'].map(x=>`<div class="card"><span>PDF</span><b>${x}</b><button class="mini" onclick="showToast('Файл скачан в демо-режиме')">Скачать</button></div>`).join('')}</div>`,
+  supportModal:`<div class="modal-head"><h2>Поддержка</h2><button class="close" onclick="closeOverlay()">×</button></div><p>Опишите вопрос — мы покажем, как будет выглядеть обращение в поддержку.</p><div class="form" style="margin-top:12px"><div class="field"><label>Ваш вопрос</label><textarea rows="5" placeholder="Напишите подробнее"></textarea></div><button class="btn full" onclick="closeOverlay();showToast('Обращение отправлено')">Отправить</button></div>`,
+  settingsModal:`<div class="modal-head"><h2>Настройки</h2><button class="close" onclick="closeOverlay()">×</button></div><div class="list"><div class="card"><b>Уведомления</b><span>Вкл.</span></div><div class="card"><b>Язык</b><span>Русский</span></div><div class="card"><b>Безопасность</b><span>›</span></div></div>`
+ };
+ openModalHtml(map[name]||'');
+}
+function openModalHtml(html){document.getElementById('modalContent').innerHTML=html;document.getElementById('overlay').classList.add('show')}
+function closeOverlay(){document.getElementById('overlay').classList.remove('show')}
+function closeModal(e){if(e.target.id==='overlay')closeOverlay()}
+
+/* COMPANY */
+function companyPage(page,btn){
+ document.querySelectorAll('#companyView .side-btn[data-page]').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');
+ const c=document.getElementById('companyContent');
+ const commonTop=(title,sub,button='')=>`<div class="dash-head"><div><h1>${title}</h1><p>${sub}</p></div>${button}</div>`;
+ if(page==='co-overview') c.innerHTML=commonTop('Кабинет компании','СтройТех · управление арендой','<button class="btn" onclick="companyPage(\'co-products\',document.querySelector(\'#companyView .side-btn[data-page=co-products]\'))">+ Добавить товар</button>')+`
+ <div class="kpis"><div class="kpi"><span class="k">Активные товары</span><b>12</b><span class="trend">+2 за месяц</span></div><div class="kpi"><span class="k">Заявки в работе</span><b>28</b><span class="trend">+12%</span></div><div class="kpi"><span class="k">Активные аренды</span><b>8</b><span class="trend">стабильно</span></div><div class="kpi"><span class="k">Доход за месяц</span><b>1,2M ₽</b><span class="trend">+18%</span></div></div>
+ <div class="two"><div class="panel"><h2>Динамика заявок</h2><div class="fake-chart"><svg viewBox="0 0 600 240" preserveAspectRatio="none"><polyline fill="none" stroke="#111a21" stroke-width="4" points="0,190 45,170 85,178 130,120 175,135 220,92 265,108 310,62 355,98 400,72 450,90 500,48 550,75 600,40"/><polyline fill="none" stroke="#7c8d96" stroke-width="3" points="0,150 45,142 85,148 130,135 175,127 220,118 265,125 310,105 355,120 400,98 450,108 500,88 550,94 600,81"/></svg></div></div>
+ <div class="panel"><h2>Новые заявки</h2><table class="table"><tbody>
+ ${[['RB-10284','Экскаватор JCB 3CX','Иван П.','Новая'],['RB-10280','LC 300','Алексей К.','Новая'],['RB-10277','Генератор 100 кВт','ООО «Строй»','На проверке']].map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td><span class="status-pill wait">${r[3]}</span></td></tr>`).join('')}
+ </tbody></table></div></div>
+ <div class="panel" style="margin-top:12px"><div class="section-title"><h2>Мои товары</h2><span>12 всего</span></div><table class="table"><thead><tr><th>Товар</th><th>Цена</th><th>Просмотры</th><th>Заявки</th><th>Статус</th><th></th></tr></thead><tbody>${products.filter(p=>p.company==='СтройТех').map(p=>`<tr><td>${p.emoji} ${p.title}</td><td>${p.priceText}</td><td>${p.views}</td><td>${p.requests}</td><td><span class="status-pill">Активен</span></td><td><button class="mini" onclick="editCompanyProduct(${p.id})">Изменить</button></td></tr>`).join('')}</tbody></table></div>`;
+ else if(page==='co-products') c.innerHTML=commonTop('Мои товары','Управление объявлениями компании','<button class="btn" onclick="newCompanyProduct()">+ Добавить товар</button>')+`
+ <div class="toolbar"><div class="left"><input id="companySearch" class="input" placeholder="Поиск по товарам" oninput="renderCompanyProducts(this.value)"><select onchange="renderCompanyProducts(document.getElementById('companySearch').value)"><option>Все статусы</option><option>Активные</option><option>Черновики</option></select></div></div>
+ <div class="panel"><table class="table"><thead><tr><th>Товар</th><th>Категория</th><th>Цена</th><th>Доступность</th><th>Статус</th><th></th></tr></thead><tbody id="companyProductsTable"></tbody></table></div>`;
+ else if(page==='co-requests') c.innerHTML=commonTop('Новые заявки','Входящие заявки от клиентов','<button class="btn ghost" onclick="showToast(\'Фильтры сброшены\')">Сбросить фильтры</button>')+`
+ <div class="toolbar"><div class="left"><select><option>Все статусы</option><option>Новые</option><option>На согласовании</option><option>Подтверждены</option></select><input class="input" placeholder="Поиск по номеру"></div></div><div class="panel"><table class="table"><thead><tr><th>Заявка</th><th>Клиент</th><th>Товар</th><th>Период</th><th>Статус</th><th></th></tr></thead><tbody>${[
+ ['RB-10284','Иван Петров','Экскаватор JCB 3CX','12–18 окт.','Новая'],
+ ['RB-10280','Алексей Ким','Toyota Land Cruiser 300','12–20 окт.','Новая'],
+ ['RB-10277','ООО «Строй»','Генератор 100 кВт','05–12 окт.','На согласовании'],
+ ['RB-10268','Мария Орлова','Мини-погрузчик Bobcat','10–12 окт.','Новая']
+].map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td><span class="status-pill wait">${r[4]}</span></td><td><button class="mini" onclick="openRequest('${r[0]}')">Открыть</button></td></tr>`).join('')}</tbody></table></div>`;
+ else if(page==='co-rentals') c.innerHTML=commonTop('Активные аренды','Текущие сделки компании')+`<div class="panel"><table class="table"><thead><tr><th>Договор</th><th>Товар</th><th>Клиент</th><th>Период</th><th>Статус</th><th></th></tr></thead><tbody>${[['AR-4401','Toyota Land Cruiser 300','Иван Петров','12–20 окт.','В аренде'],['AR-4392','Экскаватор JCB 3CX','ООО «Строй»','10–18 окт.','В аренде'],['AR-4377','Генератор 100 кВт','Алексей К.','05–12 окт.','Получение']].map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td><span class="status-pill">${r[4]}</span></td><td><button class="mini" onclick="showToast('Карточка аренды открыта')">Детали</button></td></tr>`).join('')}</tbody></table></div>`;
+ else if(page==='co-history') c.innerHTML=commonTop('История','Завершённые аренды и заявки')+`<div class="panel"><table class="table"><thead><tr><th>Дата</th><th>Товар</th><th>Клиент</th><th>Сумма</th><th>Статус</th></tr></thead><tbody>${[['18.09.2026','Мини-погрузчик Bobcat','ООО «Север»','64 000 ₽','Завершена'],['12.09.2026','Экскаватор JCB 3CX','ИП Морозов','84 000 ₽','Завершена'],['08.09.2026','Генератор 100 кВт','ООО «Форум»','35 000 ₽','Отменена']].map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td><span class="status-pill ${r[4]==='Отменена'?'off':''}">${r[4]}</span></td></tr>`).join('')}</tbody></table></div>`;
+ else if(page==='co-stats') c.innerHTML=commonTop('Статистика','Как пользователи взаимодействуют с товарами компании')+`<div class="kpis"><div class="kpi"><span class="k">Просмотры</span><b>12 480</b><span class="trend">+24%</span></div><div class="kpi"><span class="k">Заявки</span><b>286</b><span class="trend">+18%</span></div><div class="kpi"><span class="k">Конверсия</span><b>14.2%</b><span class="trend">+2.1 п.п.</span></div><div class="kpi"><span class="k">Средний чек</span><b>42 600 ₽</b><span class="trend">+7%</span></div></div><div class="two"><div class="panel"><h2>Просмотры → заявки</h2><div class="fake-chart"><svg viewBox="0 0 600 240" preserveAspectRatio="none"><polyline fill="none" stroke="#111a21" stroke-width="4" points="0,190 60,165 120,172 180,130 240,145 300,85 360,105 420,58 480,90 540,62 600,50"/></svg></div></div><div class="panel"><h2>Топ товаров</h2><table class="table"><tbody>${products.filter(p=>p.company==='СтройТех').map(p=>`<tr><td>${p.title}</td><td>${p.views} просм.</td><td>${p.requests} заяв.</td></tr>`).join('')}</tbody></table></div></div>`;
+ else if(page==='co-profile') c.innerHTML=commonTop('Профиль компании','Данные и настройки компании')+`<div class="detail-grid"><div class="panel"><h2>Основное</h2><div class="form" style="margin-top:12px"><div class="field"><label>Название</label><input value="ООО «СтройТех»"></div><div class="field"><label>ИНН</label><input value="7701234567"></div><div class="field"><label>Телефон</label><input value="+7 495 000-00-00"></div><div class="field"><label>Описание</label><textarea rows="4">Аренда строительной техники и оборудования.</textarea></div><button class="btn" onclick="showToast('Данные компании сохранены')">Сохранить</button></div></div><div class="panel"><h2>Проверка</h2><div class="info"><div class="info-row"><span>Статус</span><span class="status-pill">Проверена</span></div><div class="info-row"><span>Документы</span><b>5 / 5</b></div><div class="info-row"><span>Рейтинг</span><b>4.9 ★</b></div></div></div></div>`;
+ else c.innerHTML=commonTop('Раздел','Демо-страница');
+ if(page==='co-products')renderCompanyProducts('');
+}
+function renderCompanyProducts(q=''){const tb=document.getElementById('companyProductsTable');if(!tb)return;const arr=products.filter(p=>p.company==='СтройТех'&&(p.title+' '+p.cat).toLowerCase().includes((q||'').toLowerCase()));tb.innerHTML=arr.map(p=>`<tr><td>${p.emoji} ${p.title}</td><td>${p.cat}</td><td>${p.priceText}</td><td>12–18 окт.</td><td><span class="status-pill">Активен</span></td><td><div class="actions"><button class="mini" onclick="editCompanyProduct(${p.id})">Изменить</button><button class="mini danger" onclick="archiveProduct(${p.id})">Скрыть</button></div></td></tr>`).join('')}
+function newCompanyProduct(){openModalHtml(`<div class="modal-head"><div><h2>Новое объявление</h2><p>Создание товара компании</p></div><button class="close" onclick="closeOverlay()">×</button></div><div class="form"><div class="field"><label>Название</label><input id="newPTitle" value="Новый товар"></div><div class="field"><label>Категория</label><select id="newPCat"><option>Техника</option><option>Авто</option><option>Инструменты</option><option>Оборудование</option><option>Недвижимость</option></select></div><div class="field"><label>Цена за день</label><input id="newPPrice" value="5000"></div><div class="field"><label>Описание</label><textarea rows="4">Описание нового предложения.</textarea></div><button class="btn full" onclick="addCompanyProduct()">Создать объявление</button></div>`)}
+function addCompanyProduct(){const title=document.getElementById('newPTitle').value||'Новый товар';const cat=document.getElementById('newPCat').value;const price=Number(document.getElementById('newPPrice').value||5000);products.push({id:Date.now(),title,cat,city:'Москва',price,priceText:price.toLocaleString('ru-RU')+' ₽/день',emoji:'📦',rating:0,company:'СтройТех',views:0,requests:0,status:'active'});closeOverlay();companyPage('co-products',document.querySelector('#companyView .side-btn[data-page=co-products]'));showToast('Объявление создано')}
+function editCompanyProduct(id){const p=products.find(x=>x.id===id);openModalHtml(`<div class="modal-head"><div><h2>Редактирование</h2><p>${p.title}</p></div><button class="close" onclick="closeOverlay()">×</button></div><div class="form"><div class="field"><label>Название</label><input id="editTitle" value="${p.title}"></div><div class="field"><label>Цена</label><input id="editPrice" value="${p.price}"></div><div class="field"><label>Описание</label><textarea rows="4">Обновите описание объявления.</textarea></div><div class="actions"><button class="btn" onclick="saveCompanyProduct(${id})">Сохранить</button><button class="btn ghost" onclick="closeOverlay()">Отмена</button></div></div>`)}
+function saveCompanyProduct(id){const p=products.find(x=>x.id===id);p.title=document.getElementById('editTitle').value;p.price=Number(document.getElementById('editPrice').value||p.price);p.priceText=p.price.toLocaleString('ru-RU')+' ₽/день';closeOverlay();companyPage('co-products',document.querySelector('#companyView .side-btn[data-page=co-products]'));showToast('Изменения сохранены')}
+function archiveProduct(id){const p=products.find(x=>x.id===id);p.status='archived';showToast('Объявление скрыто');companyPage('co-products',document.querySelector('#companyView .side-btn[data-page=co-products]'))}
+function openRequest(id){openModalHtml(`<div class="modal-head"><div><h2>Заявка ${id}</h2><p>Новый запрос на аренду</p></div><button class="close" onclick="closeOverlay()">×</button></div><div class="detail-grid"><div class="detail-box"><h4>Клиент</h4><b>Иван Петров</b><p>ООО «СтройСервис»<br>+7 912 345-67-89</p></div><div class="detail-box"><h4>Товар</h4><b>Экскаватор JCB 3CX</b><p>12 000 ₽/день<br>12–18 октября</p></div></div><div class="actions" style="margin-top:12px"><button class="btn" onclick="closeOverlay();showToast('Заявка подтверждена')">Подтвердить</button><button class="btn ghost" onclick="closeOverlay()">Написать клиенту</button><button class="btn danger" onclick="closeOverlay();showToast('Заявка отклонена')">Отклонить</button></div>`)}
+/* ADMIN */
+function adminPage(page,btn){
+ document.querySelectorAll('#adminView .side-btn[data-page]').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');
+ const c=document.getElementById('adminContent');
+ const commonTop=(title,sub,button='')=>`<div class="dash-head"><div><h1>${title}</h1><p>${sub}</p></div>${button}</div>`;
+ if(page==='ad-overview')c.innerHTML=commonTop('Админка','Управление платформой RentB2B')+`<div class="kpis"><div class="kpi"><span class="k">Пользователи</span><b>428</b><span class="trend">+18%</span></div><div class="kpi"><span class="k">Компании</span><b>87</b><span class="trend">+12%</span></div><div class="kpi"><span class="k">Объявления</span><b>2 480</b><span class="trend">+25%</span></div><div class="kpi"><span class="k">Сделки</span><b>1 142</b><span class="trend">+16%</span></div></div><div class="two"><div class="panel"><h2>Динамика платформы</h2><div class="fake-chart"><svg viewBox="0 0 600 240" preserveAspectRatio="none"><polyline fill="none" stroke="#111a21" stroke-width="4" points="0,185 55,165 110,170 165,115 220,130 275,78 330,108 385,56 440,81 495,48 550,72 600,34"/></svg></div></div><div class="panel"><h2>Модерация</h2><div class="list" style="margin-top:11px"><div class="card"><b>Новые объявления</b><span class="status-pill wait">7</span></div><div class="card"><b>Жалобы</b><span class="status-pill off">3</span></div><div class="card"><b>Компании на проверке</b><span class="status-pill wait">4</span></div><div class="card"><b>Платежи на сверке</b><span class="status-pill">0</span></div></div></div></div><div class="panel" style="margin-top:12px"><h2>Последние события</h2><table class="table"><tbody>${[['10:24','Компания «СтройТех»','Создано объявление','Новая'],['10:11','Иван Петров','Создана заявка RB-10284','Обновление'],['09:48','WaveRent','Подтверждена компания','Проверка'],['09:33','DrivePro','Изменена категория товара','Обновление']].map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td><span class="status-pill">${r[3]}</span></td></tr>`).join('')}</tbody></table></div>`;
+ else if(page==='ad-users')c.innerHTML=commonTop('Пользователи','Клиенты платформы','<button class="btn ghost" onclick="showToast(\'CSV экспорт сформирован\')">Экспорт</button>')+tableUsers();
+ else if(page==='ad-companies')c.innerHTML=commonTop('Компании','Компании-арендодатели','<button class="btn" onclick="showToast(\'Форма создания компании открыта\')">+ Компания</button>')+tableCompanies();
+ else if(page==='ad-listings')c.innerHTML=commonTop('Объявления','Все предложения на платформе','<button class="btn ghost" onclick="showToast(\'Открыта очередь модерации\')">Модерация</button>')+tableListings();
+ else if(page==='ad-requests')c.innerHTML=commonTop('Заявки','Контроль заявок и статусов')+tableRequests();
+ else if(page==='ad-rentals')c.innerHTML=commonTop('Аренды','Текущие и завершённые сделки')+tableRentals();
+ else if(page==='ad-categories')c.innerHTML=commonTop('Категории','Универсальная структура marketplace','<button class="btn" onclick="newCategory()">+ Добавить категорию</button>')+tableCategories();
+ else if(page==='ad-stats')c.innerHTML=commonTop('Статистика','Показатели платформы за последние 30 дней')+`<div class="kpis"><div class="kpi"><span class="k">Просмотры</span><b>2 480 000</b><span class="trend">+25%</span></div><div class="kpi"><span class="k">Заявки</span><b>28 640</b><span class="trend">+17%</span></div><div class="kpi"><span class="k">Конверсия</span><b>14.2%</b><span class="trend">+2.1 п.п.</span></div><div class="kpi"><span class="k">GMV</span><b>48.2M ₽</b><span class="trend">+21%</span></div></div><div class="two"><div class="panel"><h2>Заявки по дням</h2><div class="fake-chart"><svg viewBox="0 0 600 240" preserveAspectRatio="none"><polyline fill="none" stroke="#111a21" stroke-width="4" points="0,190 50,176 100,181 150,140 200,151 250,105 300,115 350,93 400,116 450,69 500,81 550,58 600,42"/></svg></div></div><div class="panel"><h2>Категории</h2><table class="table"><tbody>${[['Авто','1 240','34%'],['Техника','862','26%'],['Инструменты','640','18%'],['Недвижимость','214','9%'],['Водный транспорт','128','6%']].map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('')}</tbody></table></div></div>`;
+}
+function tableUsers(){return `<div class="panel"><div class="toolbar"><div class="left"><input class="input" placeholder="Поиск по имени или телефону"><select><option>Все</option><option>Клиенты</option><option>Заблокированные</option></select></div></div><table class="table"><thead><tr><th>Пользователь</th><th>Телефон</th><th>Регистрация</th><th>Заявки</th><th>Статус</th><th></th></tr></thead><tbody>${[['Иван Петров','+7 912 345-67-89','25.09.2026','3','Активен'],['Алексей Ким','+7 923 234-56-78','20.09.2026','1','Активен'],['Мария Орлова','+7 903 345-67-89','18.09.2026','2','Активен'],['Дмитрий Л.','+7 977 456-78-90','05.09.2026','1','Заблокирован']].map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td><span class="status-pill ${r[4]!=='Активен'?'off':''}">${r[4]}</span></td><td><button class="mini" onclick="showToast('Карточка пользователя открыта')">Открыть</button></td></tr>`).join('')}</tbody></table></div>`}
+function tableCompanies(){return `<div class="panel"><table class="table"><thead><tr><th>Компания</th><th>ИНН</th><th>Объявления</th><th>Сделки</th><th>Проверка</th><th></th></tr></thead><tbody>${[['СтройТех','7701234567','12','84','Проверена'],['DrivePro','7702345678','36','142','Проверена'],['WaveRent','2312345678','18','63','Проверена'],['CitySpace','7703456789','9','21','На проверке']].map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td><span class="status-pill ${r[4]!=='Проверена'?'wait':''}">${r[4]}</span></td><td><div class="actions"><button class="mini" onclick="showToast('Карточка компании открыта')">Открыть</button><button class="mini danger" onclick="showToast('Компания заблокирована в демо-режиме')">Блок</button></div></td></tr>`).join('')}</tbody></table></div>`}
+function tableListings(){return `<div class="panel"><div class="toolbar"><div class="left"><input class="input" placeholder="Поиск по объявлениям"><select><option>Все категории</option><option>Авто</option><option>Техника</option><option>Недвижимость</option></select></div></div><table class="table"><thead><tr><th>Объявление</th><th>Компания</th><th>Категория</th><th>Цена</th><th>Статус</th><th></th></tr></thead><tbody>${products.map(p=>`<tr><td>${p.emoji} <b>${p.title}</b></td><td>${p.company}</td><td>${p.cat}</td><td>${p.priceText}</td><td><span class="status-pill ${p.status==='archived'?'off':''}">${p.status==='archived'?'Скрыто':'Активно'}</span></td><td><div class="actions"><button class="mini" onclick="showToast('Объявление открыто')">Открыть</button><button class="mini danger" onclick="showToast('Объявление заблокировано')">Блок</button></div></td></tr>`).join('')}</tbody></table></div>`}
+function tableRequests(){return `<div class="panel"><table class="table"><thead><tr><th>Заявка</th><th>Клиент</th><th>Компания</th><th>Дата</th><th>Статус</th></tr></thead><tbody>${[['RB-10284','Иван Петров','СтройТех','22.09 10:00','Новая'],['RB-10280','Алексей Ким','DrivePro','22.09 11:30','Подтверждена'],['RB-10277','ООО «Строй»','PowerRent','22.09 13:00','На согласовании'],['RB-10268','Мария Орлова','СтройТех','22.09 16:00','Новая']].map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td><span class="status-pill ${r[4]!=='Подтверждена'?'wait':''}">${r[4]}</span></td></tr>`).join('')}</tbody></table></div>`}
+function tableRentals(){return `<div class="panel"><table class="table"><thead><tr><th>Договор</th><th>Товар</th><th>Компания</th><th>Период</th><th>Статус</th></tr></thead><tbody>${[['AR-4401','Toyota Land Cruiser 300','DrivePro','12–20 окт.','В аренде'],['AR-4392','Экскаватор JCB 3CX','СтройТех','10–18 окт.','В аренде'],['AR-4377','Генератор 100 кВт','PowerRent','05–12 окт.','Завершена']].map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td><span class="status-pill ${r[4]==='Завершена'?'wait':''}">${r[4]}</span></td></tr>`).join('')}</tbody></table></div>`}
+function tableCategories(){return `<div class="panel"><table class="table"><thead><tr><th>Категория</th><th>Объявления</th><th>Атрибутов</th><th>Статус</th><th></th></tr></thead><tbody>${[['Авто','1 240','8'],['Техника','862','11'],['Инструменты','640','9'],['Недвижимость','214','14'],['Водный транспорт','128','10'],['IT и офис','74','7']].map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td><span class="status-pill">Активна</span></td><td><button class="mini" onclick="showToast('Настройки категории открыты')">Изменить</button></td></tr>`).join('')}</tbody></table></div>`}
+function newCategory(){openModalHtml(`<div class="modal-head"><div><h2>Новая категория</h2><p>Добавление универсальной категории</p></div><button class="close" onclick="closeOverlay()">×</button></div><div class="form"><div class="field"><label>Название</label><input id="catName" placeholder="Например, Медицинское оборудование"></div><div class="field"><label>Описание</label><textarea rows="3"></textarea></div><div class="field"><label>Атрибуты</label><input placeholder="Модель, год, мощность..."></div><button class="btn" onclick="closeOverlay();showToast('Категория создана в демо-режиме')">Создать категорию</button></div>`)}
+function updateInitial(){renderPopular();renderCatalog('');renderFavorites();renderBookings();updateFavCount();renderChat();updateBookingTotal()}
+updateInitial();
+</script>
+</body>
+</html>
